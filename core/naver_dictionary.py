@@ -19,5 +19,3 @@ class Naver_Translator:
 
         return result
 
-Naver_Translator()
-print()
