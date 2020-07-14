@@ -49,9 +49,9 @@ class Customized_Mouse_API:
                         self.functions['left_up']()
 
         elif button == mouse.Button.right and not pressed:
-            self.functions['right_up']()
+            self.functions['right_up'](self.status)
 
-        if not pressed:
+        if not pressed and mouse.Button.left:
             self.status['last_clicked_time'] = time.time()
             self.status['moving_count'] = 0
         
