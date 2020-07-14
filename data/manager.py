@@ -3,6 +3,7 @@ import multiprocessing as mp
 
 from core.papago import Papago
 from core.twinword import Twinword
+from core.google_dictionary import Google_Dictionary
 
 from utility import * 
 
@@ -15,6 +16,7 @@ class Manager(mp.Process):
 
         self.papago = Papago()
         self.twinword = Twinword()
+        self.google_dict = Google_Dictionary()
 
         self.queue = mp.Queue(maxsize=50)
 
