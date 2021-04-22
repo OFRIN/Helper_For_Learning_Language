@@ -10,7 +10,7 @@ class Twinword:
 
         self.url_format = "https://twinword-word-graph-dictionary.p.rapidapi.com/{}/"
         self.class_names = ['definition_kr', 'example']
-
+    
     def get(self, word, class_names=None):
         if class_names is None: class_names = self.class_names
 

@@ -19,7 +19,7 @@ class Manager(mp.Process):
         self.google_dict = Google_Dictionary()
 
         self.queue = mp.Queue(maxsize=50)
-
+    
     def push(self, text):
         self.queue.put(text)
 

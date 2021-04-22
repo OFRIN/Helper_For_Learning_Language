@@ -11,9 +11,10 @@ class Customized_Mouse_API:
             'x' : -1,
             'y' : -1,
 
-            'moving_count' : 0,
+            'direction': 'left',
             'pressed' : False,
-
+            
+            'moving_count' : 0,
             'last_clicked_time' : 0,
         }
 
@@ -33,18 +34,24 @@ class Customized_Mouse_API:
     def on_click(self, x, y, button, pressed):
         self.status['x'] = x
         self.status['y'] = y
+        self.status['direction'] = 'right' if button == mouse.Button.right else 'left'
         self.status['pressed'] = pressed
 
-        print(button, pressed)
+        variables = [self.status['direction'], self.status['pressed'], self.status['x'], self.status['y']]
+        event_format = 'event_name={}, direction={}, pressed={}, x={}, y={}'
         
-        if button == mouse.Button.left:
+        if self.status['direction'] == 'left':
             if self.status['pressed']:
                 pass
             else:
                 if self.status['moving_count'] > 20:
+                    print(self.status['last_clicked_time'], time.time(), 'DRAG')
                     self.functions['drag'](self.status)
                 else:
                     interval = float(time.time() - self.status['last_clicked_time'])
+
+                    print(self.status['last_clicked_time'], time.time(), interval)
+
                     if interval < 0.5:
                         self.functions['double_click'](self.status)
                     else:
