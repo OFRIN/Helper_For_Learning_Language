@@ -1,5 +1,5 @@
 
-from core.keyboard_api import Customized_Keyboard_Listener
+from core.devices.keyboard_api import Customized_Keyboard_Listener
 
 def function():
     print('hotkey')

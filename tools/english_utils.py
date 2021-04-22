@@ -1,7 +1,3 @@
-import json
-
-from pynput import keyboard
-
 def check_string_type(data):
     if type(data) == type(''):
         if data != '':
@@ -15,7 +11,7 @@ def check_sentence_or_word(data):
         return True
     return False
 
-def check_korean_sentence(data):
+def check_english_sentence(data):
     alphabet_large = 'ABCDEFGHIJKNMLOPQRSTUVWXYZ'
     alphabet_lower = alphabet_large.lower()
 
@@ -32,8 +28,8 @@ def check_korean_sentence(data):
             ko_count += 1
 
     if en_count > ko_count:
-        return False
-    return True
+        return True
+    return False
 
 def preprocessing_for_string(data):
     data = data.replace('\n', ' ')
@@ -51,13 +47,3 @@ def preprocessing_for_string(data):
             break
     
     return data
-
-def read_json(filepath):
-    with open(filepath, 'r') as f:
-        data = json.load(f)
-    return data
-
-def write_json(filepath, data):
-    with open(filepath, 'w') as f:
-        json.dump(data, f, indent = '\t')
-
