@@ -4,9 +4,9 @@ import json
 import urllib.request
 
 class Papago:
-    def __init__(self, client_id="tBx3EbbN6U66M8XG4yvj", client_secret="dPFiBXCDE5"):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, client_ids, client_secrets):
+        self.client_ids = client_ids
+        self.client_secrets = client_secrets
         
     def ko2en_translate(self, text):
         return self.predict(text, 'ko', 'en')
@@ -18,16 +18,21 @@ class Papago:
         encText = urllib.parse.quote(text)
         data = "source={}&target={}&text={}".format(source, target, encText)
         
-        request = urllib.request.Request("https://openapi.naver.com/v1/papago/n2mt")
-        request.add_header("X-Naver-Client-Id", self.client_id)
-        request.add_header("X-Naver-Client-Secret", self.client_secret)
+        for client_id, client_secret in zip(self.client_ids, self.client_secrets):
+            try:
+                request = urllib.request.Request("https://openapi.naver.com/v1/papago/n2mt")
+                request.add_header("X-Naver-Client-Id", client_id)
+                request.add_header("X-Naver-Client-Secret", client_secret)
 
-        response = urllib.request.urlopen(request, data=data.encode("utf-8"))
-
-        rescode = response.getcode()
-        if rescode == 200:
-            response_body = response.read()
-            results = json.loads(response_body.decode('utf-8'))
-            return results['message']['result']['translatedText']
-        else:
-            return None
+            
+                response = urllib.request.urlopen(request, data=data.encode("utf-8"))
+            
+                rescode = response.getcode()
+                if rescode == 200:
+                    response_body = response.read()
+                    results = json.loads(response_body.decode('utf-8'))
+                    return results['message']['result']['translatedText']
+                else:
+                    return None
+            except:
+                pass

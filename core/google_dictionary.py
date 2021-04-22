@@ -13,3 +13,4 @@ class Google_Dictionary:
         results = json.dumps(results, indent='\t')
 
         print(results)
+

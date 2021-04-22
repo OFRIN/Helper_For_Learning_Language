@@ -157,3 +157,5 @@ dmypy.json
 experiments/
 *.pth
 *.zip
+
+*.json

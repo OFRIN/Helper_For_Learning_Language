@@ -33,12 +33,12 @@ class Collector(QMainWindow):
         }
         self.mouse = Customized_Mouse_API(functions)
         self.mouse_controller = mouse.Controller()
-        
+
         option = {
             'print_fn' : self.print_fn
         }
         self.manager = Manager(**option)
-        self.manager.start()
+        # self.manager.start()
 
         self.is_running = False
 
@@ -46,7 +46,7 @@ class Collector(QMainWindow):
 
         self.setWindowTitle('Collector_v1.2.0')
         self.resize(500, 700)
-
+    
     ##################################################################
     # On and Off
     ##################################################################

@@ -2,21 +2,22 @@ import json
 import requests
 
 class Twinword:
-    def __init__(self, client_id="twinword-word-graph-dictionary.p.rapidapi.com", client_secret="ad488424d5mshb367d2b5876b950p164619jsn4bd9e9fc740f"):
+    def __init__(self, client_id, client_secret):
         self.headers = {
             'x-rapidapi-host': client_id,
             'x-rapidapi-key': client_secret
         }
-
+        
         self.url_format = "https://twinword-word-graph-dictionary.p.rapidapi.com/{}/"
         self.class_names = ['definition_kr', 'example']
-    
+
     def get(self, word, class_names=None):
-        if class_names is None: class_names = self.class_names
+        if class_names is None: 
+            class_names = self.class_names
 
         results = {}
         querystring = {"entry":word}
-
+        
         if 'definition_kr' in class_names:
             url = self.url_format.format('definition_kr')
             response = requests.request("GET", url, headers=self.headers, params=querystring)

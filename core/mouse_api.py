@@ -2,9 +2,8 @@ import time
 
 from pynput import mouse
 
-class Customized_Mouse_API:
-    def __init__(self, functions, debug=False):
-        self.debug = debug
+class Customized_Mouse_Listener:
+    def __init__(self, functions, moving_threshold=20, double_click_interval=0.5):
         self.functions = functions
 
         self.status = {
@@ -23,6 +22,9 @@ class Customized_Mouse_API:
             on_click=self.on_click,
         )
         self.listener.start()
+
+        self.moving_threshold = moving_threshold
+        self.double_click_interval = double_click_interval
 
     def on_move(self, x, y):
         self.status['x'] = x
@@ -44,15 +46,14 @@ class Customized_Mouse_API:
             if self.status['pressed']:
                 pass
             else:
-                if self.status['moving_count'] > 20:
-                    print(self.status['last_clicked_time'], time.time(), 'DRAG')
+                if self.status['moving_count'] > self.moving_threshold:
+                    # print(self.status['last_clicked_time'], time.time(), 'DRAG')
                     self.functions['drag'](self.status)
                 else:
                     interval = float(time.time() - self.status['last_clicked_time'])
+                    # print(self.status['last_clicked_time'], time.time(), interval)
 
-                    print(self.status['last_clicked_time'], time.time(), interval)
-
-                    if interval < 0.5:
+                    if interval < self.double_click_interval:
                         self.functions['double_click'](self.status)
                     else:
                         self.functions['left_up'](self.status)
@@ -63,9 +64,3 @@ class Customized_Mouse_API:
         if not pressed and mouse.Button.left:
             self.status['last_clicked_time'] = time.time()
             self.status['moving_count'] = 0
-        
-if __name__ == '__main__':
-    obj = Customized_Mouse_API()
-
-    while True:
-        pass
