@@ -3,8 +3,6 @@ import sys
 import time
 import platform
 
-from pynput import mouse
-
 from PyQt5 import QtGui
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
@@ -24,7 +22,7 @@ class Collector(QMainWindow):
             '<ctrl>+<shift>+<space>' : self.onoff_switch
         }
         self.keyboard = Customized_Keyboard_API(hotkey_dictionary)
-
+        
         functions = {
             'drag' : self.mouse_event_drag,
             'left_up' : self.mouse_event_left_up,

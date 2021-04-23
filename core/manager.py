@@ -1,11 +1,9 @@
 import queue
 import multiprocessing as mp
 
-from core.papago import Papago
+from .papago import Papago
 from core.twinword import Twinword
 from core.google_dictionary import Google_Dictionary
-
-from utility import * 
 
 class Manager(mp.Process):
     def __init__(self, print_fn):
@@ -22,7 +20,7 @@ class Manager(mp.Process):
     
     def push(self, text):
         self.queue.put(text)
-
+    
     def run(self):
         while True:
             text = self.queue.get()
