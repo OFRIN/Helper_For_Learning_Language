@@ -7,12 +7,12 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import QPoint
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
 
-from core.mouse_api import Customized_Mouse_API
-from core.keyboard_api import Customized_Keyboard_API
+from core.english_modules import Manager, Google_Dictionary
 
-from data.manager import *
+from core.devices.mouse_api import Customized_Mouse_Listener
+from core.devices.keyboard_api import Customized_Keyboard_Listener
 
-from utility import * 
+from registration_window import Registration_Window
 
 class Collector(QMainWindow):
     def __init__(self):
@@ -21,7 +21,7 @@ class Collector(QMainWindow):
         hotkey_dictionary = {
             '<ctrl>+<shift>+<space>' : self.onoff_switch
         }
-        self.keyboard = Customized_Keyboard_API(hotkey_dictionary)
+        self.keyboard_listner = Customized_Keyboard_Listener(hotkey_dictionary)
         
         functions = {
             'drag' : self.mouse_event_drag,
@@ -29,16 +29,17 @@ class Collector(QMainWindow):
             'right_up' : self.mouse_event_right_up,
             'double_click' : self.mouse_event_double_click
         }
-        self.mouse = Customized_Mouse_API(functions)
-        self.mouse_controller = mouse.Controller()
+        self.mouse_listner = Customized_Mouse_Listener(functions)
 
-        option = {
-            'print_fn' : self.print_fn
-        }
-        self.manager = Manager(**option)
+        # option = {
+        #     'print_fn' : self.print_fn
+        # }
+        # self.manager = Manager(**option)
         # self.manager.start()
 
-        self.is_running = False
+        self.google_dict = Google_Dictionary()
+
+        self.is_running = True
 
         QApplication.clipboard().dataChanged.connect(self.event_clipboard)
 
@@ -60,18 +61,19 @@ class Collector(QMainWindow):
     # Translate
     ##################################################################
     def print_fn(self, result):
-        print(json.dumps(result, indent='\t'))
-
+        print(result)
+    
     ##################################################################
     # Mouse Event Handler
     ##################################################################
     def mouse_event_drag(self, status):
-        self.create_context_menu(QPoint(status['x'], status['y']))
-
+        print('[DRAG]', status)
+        self.keyboard_listner.copy()
+    
     def mouse_event_double_click(self, status):
-        # self.create_context_menu(QPoint(status['x'], status['y']))
-        pass
-
+        print('[DOUBLE]', status)
+        self.keyboard_listner.copy()
+        
     def mouse_event_left_up(self, status):
         pass
 
@@ -81,32 +83,36 @@ class Collector(QMainWindow):
     ##################################################################
     # Functions using PyQt5 
     ##################################################################
-    # Context Menu가 종료된 후 왜 double click 이벤트가 발생하는지 확인 필요
-    
     def event_clipboard(self):
         if self.is_running:
             text = QApplication.clipboard().text()
-            self.manager.push(text)
 
-    def create_context_menu(self, position):
-        if self.is_running:
-            contextMenu = QMenu(self)
-            
-            action_of_word = contextMenu.addAction("Word")
-            action_of_sentence = contextMenu.addAction("Sentence")
-            
-            action = contextMenu.exec_(position)
+            data = self.google_dict.get(text)
+            if isinstance(data, list):
+                print(data[0])
 
-            if action == action_of_word:
-                print('Word')
+                re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
+                re_window.show()
+    
+    # def create_context_menu(self, position):
+    #     if self.is_running:
+    #         contextMenu = QMenu(self)
+            
+    #         action_of_word = contextMenu.addAction("Word")
+    #         action_of_sentence = contextMenu.addAction("Sentence")
+            
+    #         action = contextMenu.exec_(position)
+
+    #         if action == action_of_word:
+    #             print('Word')
                 
-            elif action == action_of_sentence:
-                print('Sentence')
+    #         elif action == action_of_sentence:
+    #             print('Sentence')
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
     window = Collector()
-
+    
     if platform.system() == 'Linux':
         os.system('clear')
     else:

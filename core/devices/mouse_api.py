@@ -22,7 +22,7 @@ class Customized_Mouse_Listener:
             on_click=self.on_click,
         )
         self.listener.start()
-
+        
         self.moving_threshold = moving_threshold
         self.double_click_interval = double_click_interval
 

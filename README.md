@@ -2,6 +2,13 @@
 
 - PyQt5 [link](https://www.riverbankcomputing.com/static/Docs/PyQt5/)
 - pynput [link](https://pynput.readthedocs.io/en/latest/index.html)
+- VLC
+
+```bash
+pip install PyQt5
+pip install pynput
+pip install python-vlc
+```
 
 # Library
 - twinword (https://rapidapi.com/twinword/api/word-dictionary/pricing)

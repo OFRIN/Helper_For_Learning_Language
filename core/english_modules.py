@@ -5,20 +5,28 @@ import json
 import requests
 import urllib.request
 
+import queue
+import multiprocessing as mp
+
+from tools.json_utils import read_json
+
 from tools.english_utils import check_english_sentence
+from tools.english_utils import *
 
 # Interpret english word to english explanation
 class Google_Dictionary:
     def __init__(self, version='v3'):
-        searching_format = f'http://api.dictionaryapi.dev/api/{version}' + '/entries/en/{}'
-        self.get_url_fn = lambda word: searching_format.format(word)
+        self.searching_format = f'http://api.dictionaryapi.dev/api/{version}' + '/entries/en/{}'
+
+    def get_url(self, word):
+        return self.searching_format.format(word)
 
     def get(self, word):
-        url = self.get_url_fn(word)
+        url = self.get_url(word)
         response = requests.get(url)
 
         results = json.loads(response.text)
-        results = json.dumps(results, indent='\t', ensure_ascii=False)
+        # results = json.dumps(results, indent='\t', ensure_ascii=False)
 
         """
         [
@@ -46,9 +54,9 @@ class Google_Dictionary:
                             ]
                     }
             }
-    ]
+        ]
         """
-        print(results)
+        return results
 
 # Interpret english word to english explanation aend korean expression
 class Twinword:
@@ -132,3 +140,50 @@ class Papago:
                     return None
             except:
                 pass
+
+class Manager(mp.Process):
+    def __init__(self, print_fn):
+        super().__init__()
+
+        # self.daemon = True
+        self.print_fn = print_fn
+
+        self.info_dic = read_json('./data/private_information.json')
+
+        self.papago = Papago(**self.info_dic['papago'])
+        self.twinword = Twinword(**self.info_dic['twinword'])
+        self.google_dict = Google_Dictionary()
+
+        self.queue = mp.Queue(maxsize=50)
+
+    def push(self, text):
+        self.queue.put(text)
+    
+    def run(self):
+        while True:
+            text = self.queue.get()
+
+            result = self.google_dict.get(text)
+            self.print_fn(result)
+            
+            # if check_string_type(text):
+            #     text = preprocessing_for_string(text)
+
+            #     if len(text) > 0:
+            #         # 1. word or sentence
+            #         if check_sentence_or_word(text):
+            #             # 1.1. [sentence] korean or english
+            #             if check_korean_sentence(text):
+            #                 result = self.papago.ko2en_translate(text)
+            #             else:
+            #                 result = self.papago.en2ko_translate(text)
+
+            #         else:
+            #             # 2.1. [Word] korean or english
+            #             if check_korean_sentence(text):
+            #                 result = self.papago.ko2en_translate(text)
+            #                 result = self.twinword.get(result)
+            #             else:
+            #                 result = self.twinword.get(text)
+
+            #         self.print_fn(result)
