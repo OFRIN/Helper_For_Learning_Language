@@ -122,7 +122,8 @@ class MP3_Callback:
 
         # QtMultimedia.QSound.play(self.mp3_url)
 
-class Registration_Window(QtWidgets.QWidget):
+# class Registration_Window(QtWidgets.QWidget):
+class Registration_Window(QtWidgets.QDialog):
     def __init__(self, word, phonetics, meanings):
         super().__init__(parent=None)
 
@@ -203,8 +204,11 @@ class Registration_Window(QtWidgets.QWidget):
 
         # self.table_of_meanings.adjustSize()
 
+    def show(self):
+        return super().exec_()
+
 if __name__ == "__main__":
-    # """
+    """
     data = [
             {
                     "word": "take",
@@ -342,7 +346,7 @@ if __name__ == "__main__":
                     }
             }
     ]
-    # """
+    """
     """
     data = [
                 {
@@ -481,6 +485,7 @@ if __name__ == "__main__":
                 }
         ]
     """
+    data = [{'word': 'sorted', 'phonetics': [{'text': '/ˈsɔrdəd/', 'audio': 'https://lex-audio.useremarkable.com/mp3/sorted_us_1.mp3'}], 'meaning': {'adjective': [{'definition': 'Organized; arranged; fixed up.'}]}}]
     app = QtWidgets.QApplication(sys.argv)
 
     re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])

@@ -89,7 +89,7 @@ class Collector(QMainWindow):
 
             data = self.google_dict.get(text)
             if isinstance(data, list):
-                print(data[0])
+                print(data)
 
                 re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
                 re_window.show()
