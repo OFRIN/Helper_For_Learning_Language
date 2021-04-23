@@ -145,7 +145,7 @@ class Manager(mp.Process):
     def __init__(self, print_fn):
         super().__init__()
 
-        # self.daemon = True
+        self.daemon = True
         self.print_fn = print_fn
 
         self.info_dic = read_json('./data/private_information.json')

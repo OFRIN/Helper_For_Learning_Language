@@ -2,7 +2,7 @@
 
 - PyQt5 [link](https://www.riverbankcomputing.com/static/Docs/PyQt5/)
 - pynput [link](https://pynput.readthedocs.io/en/latest/index.html)
-- VLC
+- VLC [link](https://www.videolan.org/vlc/download-windows.html)
 
 ```bash
 pip install PyQt5
