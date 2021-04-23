@@ -9,15 +9,16 @@ from tools.english_utils import check_english_sentence
 
 # Interpret english word to english explanation
 class Google_Dictionary:
-    def __init__(self):
-        self.get_url_fn = lambda word: 'http://api.dictionaryapi.dev/api/v3/entries/en/{}'.format(word)
+    def __init__(self, version='v3'):
+        searching_format = f'http://api.dictionaryapi.dev/api/{version}' + '/entries/en/{}'
+        self.get_url_fn = lambda word: searching_format.format(word)
 
     def get(self, word):
         url = self.get_url_fn(word)
         response = requests.get(url)
 
         results = json.loads(response.text)
-        results = json.dumps(results, indent='\t')
+        results = json.dumps(results, indent='\t', ensure_ascii=False)
 
         """
         [
@@ -25,7 +26,9 @@ class Google_Dictionary:
                     "word": "decide",
                     "phonetics": [
                             {
-                                    "text": "/d\u0259\u02c8sa\u026ad/",
+                                    "text": "/dəˈsaɪd/",
+                                    "audio": "https://lex-audio.useremarkable.com/mp3/decide_us_1.mp3"
+                            }
                     ],
                     "meaning": {
                             "transitive verb": [
@@ -43,7 +46,7 @@ class Google_Dictionary:
                             ]
                     }
             }
-        ]
+    ]
         """
         print(results)
 

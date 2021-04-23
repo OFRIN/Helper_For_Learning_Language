@@ -22,7 +22,7 @@ class Window(QMainWindow):
   
         # setting up border
         self.label_1.setStyleSheet("border: 1px solid black;")
-  
+        
         # creating a label widget
         # self.label_2 = QLabel("====== Adjusted label =====", self)
         self.label_2 = QLabel("====== Normal label =====", self)
