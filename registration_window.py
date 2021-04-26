@@ -126,6 +126,10 @@ class MP3_Callback:
 class Registration_Window(QtWidgets.QDialog):
     def __init__(self, word, phonetics, meanings):
         super().__init__(parent=None)
+        
+        # 검토 필요
+        # self.center()
+        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint|QtCore.Qt.FramelessWindowHint)
 
         self.minimum_width = 300
         
@@ -141,6 +145,12 @@ class Registration_Window(QtWidgets.QDialog):
 
         if self.geometry().width() < self.minimum_width:
             self.setFixedWidth(self.minimum_width)
+
+    def center(self):
+        qr = self.frameGeometry()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
 
     def make_groupbox_for_phonetics(self, phonetics):
         rect_of_word = self.word.geometry()

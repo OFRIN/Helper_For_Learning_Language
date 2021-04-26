@@ -3,14 +3,20 @@ import sys
 import time
 import platform
 
-from PyQt5 import QtGui
-from PyQt5.QtCore import QPoint
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu
+from queue import Queue
 
-from core.english_modules import Manager, Google_Dictionary
+from PyQt5 import QtGui
+from PyQt5.QtCore import QPoint, QTimer, Qt
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QPushButton
+
+from core.english_modules import Papago, Twinword, Google_Dictionary
+from core.managing_modules import Manager
 
 from core.devices.mouse_api import Customized_Mouse_Listener
 from core.devices.keyboard_api import Customized_Keyboard_Listener
+
+from tools.json_utils import dict_to_json
+from tools.qt_utils import make_label, make_push_button, make_edit, get_width_and_height, make_checkbox
 
 from registration_window import Registration_Window
 
@@ -18,10 +24,18 @@ class Collector(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        hotkey_dictionary = {
-            '<ctrl>+<shift>+<space>' : self.onoff_switch
-        }
-        self.keyboard_listner = Customized_Keyboard_Listener(hotkey_dictionary)
+        #####################################################################################
+        # Variables
+        #####################################################################################
+        self.flag_debug = False
+        self.flag_detect_mouse_events = False
+        self.flag_auto_search = False
+
+        # make listeners
+        # hotkey_dictionary = {
+        #     '<ctrl>+<shift>+<space>' : self.onoff_switch
+        # }
+        # self.keyboard_listner = Customized_Keyboard_Listener(hotkey_dictionary)
         
         functions = {
             'drag' : self.mouse_event_drag,
@@ -31,48 +45,88 @@ class Collector(QMainWindow):
         }
         self.mouse_listner = Customized_Mouse_Listener(functions)
 
-        # option = {
-        #     'print_fn' : self.print_fn
-        # }
-        # self.manager = Manager(**option)
+        # make queue
+        self.queue = Queue(maxsize=50)
+
+        # make manger
+        # self.manager = Manager(self.queue, self.custom_function)
         # self.manager.start()
 
         self.google_dict = Google_Dictionary()
 
-        self.is_running = True
+        #####################################################################################
+        # UI (about PyQt5)
+        #####################################################################################
+        self.initUI()
 
+        # connect function to detect text in clipboard
         QApplication.clipboard().dataChanged.connect(self.event_clipboard)
-
-        self.setWindowTitle('Collector_v1.2.0')
-        self.resize(500, 700)
     
+    def initUI(self):
+        self.setWindowTitle('Helper For Learning Language')
+        self.resize(600, 120)
+
+        self.check_logs = make_checkbox(self, 'Logs (ON/OFF)', (10, 10), self.show_logs)
+        self.check_mouse = make_checkbox(self, 'Detect Mouse (ON/OFF)', (10, 30), self.detect_mouse_events)
+        self.check_auto = make_checkbox(self, 'Auto Searching (ON/OFF)', (10, 50), self.auto_searching)
+
+        self.check_logs.setChecked(True)
+
+        self.edi_word = make_edit(self, 'empty', (10, 90))
+
+        x, y, width, height = get_width_and_height(self.edi_word)
+        self.btn_search = make_push_button(self, '검색', (x + width + 10, y), self.search)
+
+        # self.timer_to_adjust_ui = QTimer(self)
+        # self.timer_to_adjust_ui.setInterval(1000)
+        # self.timer_to_adjust_ui.timeout.connect(self.update_ui)
+        # self.timer_to_adjust_ui.start()
+
+        self.flag_debug = self.check_logs.isChecked()
+        self.flag_detect_mouse_events = self.check_mouse.isChecked()
+
+        # self.adjustSize()
+
     ##################################################################
-    # On and Off
+    # Customized Functions
     ##################################################################
     def onoff_switch(self):
-        if self.is_running:
-            self.is_running = False
-            self.hide()
-        else:
-            self.is_running = True
-            self.show()
+        pass
     
-    ##################################################################
-    # Translate
-    ##################################################################
-    def print_fn(self, result):
-        print(result)
+    def show_registration(self, data):
+        sub_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
+        sub_window.show()
+
+    def search(self):
+        self.btn_search.setDisabled(True)
+        # self.queue.put(self.edi_word.text())
+
+        data = self.google_dict.get(self.edi_word.text())
+        self.show_registration(data)
+
+        self.btn_search.setDisabled(False)
     
+    def show_logs(self, state):
+        self.flag_debug = self.check_logs.isChecked()
+    
+    def detect_mouse_events(self, state):
+        self.flag_detect_mouse_events = self.check_mouse.isChecked()
+
+    def auto_searching(self, state):
+        self.flag_auto_search = self.check_auto.isChecked()
+
     ##################################################################
     # Mouse Event Handler
     ##################################################################
     def mouse_event_drag(self, status):
-        print('[DRAG]', status)
-        self.keyboard_listner.copy()
+        if self.flag_detect_mouse_events:
+            print('[DRAG]', status)
+            # self.keyboard_listner.copy()
     
     def mouse_event_double_click(self, status):
-        print('[DOUBLE]', status)
-        self.keyboard_listner.copy()
+        if self.flag_detect_mouse_events:
+            print('[DOUBLE]', status)
+            # self.keyboard_listner.copy()
         
     def mouse_event_left_up(self, status):
         pass
@@ -84,39 +138,30 @@ class Collector(QMainWindow):
     # Functions using PyQt5 
     ##################################################################
     def event_clipboard(self):
-        if self.is_running:
-            text = QApplication.clipboard().text()
+        text = QApplication.clipboard().text()
 
-            data = self.google_dict.get(text)
-            if isinstance(data, list):
-                print(data)
+        if self.flag_debug:
+            print(text, type(text), len(text))
 
-                re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
-                re_window.show()
-    
-    # def create_context_menu(self, position):
-    #     if self.is_running:
-    #         contextMenu = QMenu(self)
-            
-    #         action_of_word = contextMenu.addAction("Word")
-    #         action_of_sentence = contextMenu.addAction("Sentence")
-            
-    #         action = contextMenu.exec_(position)
+        # for image or not
+        if len(text) > 0:
+            # self.queue.put(text)
+            self.edi_word.setText(text)
 
-    #         if action == action_of_word:
-    #             print('Word')
-                
-    #         elif action == action_of_sentence:
-    #             print('Sentence')
+            if self.flag_auto_search:
+                self.btn_search.click()
 
 if __name__ == '__main__':
+    # if platform.system() == 'Linux':
+    #     os.system('clear')
+    # else:
+    #     os.system('cls')
+
     App = QApplication(sys.argv)
+
     window = Collector()
-    
-    if platform.system() == 'Linux':
-        os.system('clear')
-    else:
-        os.system('cls')
+    window.show()
+    # window.hide()
 
     sys.exit(App.exec())
 

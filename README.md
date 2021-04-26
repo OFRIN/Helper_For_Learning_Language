@@ -16,3 +16,8 @@ pip install python-vlc
 
 # 
 1. python -m PyQt5.uic.pyuic -x [FILENAME].ui -o [FILENAME].py
+
+# TODO
+
+1. Default Low
+2. Registration High

@@ -12,3 +12,5 @@ def write_json(filepath, data, encoding=None):
     with open(filepath, 'w', encoding=encoding) as f:
         json.dump(data, f, indent = '\t', ensure_ascii=False)
 
+def dict_to_json(data):
+    return json.dumps(data, indent = '\t', ensure_ascii=False)
