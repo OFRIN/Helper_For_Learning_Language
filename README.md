@@ -19,5 +19,6 @@ pip install python-vlc
 
 # TODO
 
-1. Default Low
-2. Registration High
+1. 보고 있는 모니터 왼쪽 위로 출력
+2. Kindle 옵션 추가한 뒤 Kindle로 보고 있는 경우 처리
+3. 단어, 문장에 따른 입력 시나리오

@@ -129,7 +129,8 @@ class Registration_Window(QtWidgets.QDialog):
         
         # 검토 필요
         # self.center()
-        # self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint|QtCore.Qt.FramelessWindowHint)
+        self.move(10, 10)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint|QtCore.Qt.FramelessWindowHint)
 
         self.minimum_width = 300
         
@@ -160,7 +161,7 @@ class Registration_Window(QtWidgets.QDialog):
         
         margin = 20
         rect_of_group = self.group_of_phonetics.geometry()
-
+        
         # for i in range(3):
         #     phonetics.append(phonetics[0])
 
