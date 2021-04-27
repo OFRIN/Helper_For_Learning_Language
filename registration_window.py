@@ -124,7 +124,7 @@ class MP3_Callback:
 
 # class Registration_Window(QtWidgets.QWidget):
 class Registration_Window(QtWidgets.QDialog):
-    def __init__(self, word, phonetics, meanings):
+    def __init__(self, word, phonetics, meanings, korean_meaning=''):
         super().__init__(parent=None)
         
         # 검토 필요
@@ -137,6 +137,9 @@ class Registration_Window(QtWidgets.QDialog):
         self.setWindowTitle("Registration")
         self.setGeometry(QtCore.QRect(10, 10, self.minimum_width, 300))
         
+        if korean_meaning is not '':
+            word += ' : ' + korean_meaning
+            
         self.word = make_label(self, word, (10, 10), bold=True, font_size=20)
         
         self.make_groupbox_for_phonetics(phonetics)
@@ -496,10 +499,37 @@ if __name__ == "__main__":
                 }
         ]
     """
-    data = [{'word': 'sorted', 'phonetics': [{'text': '/ˈsɔrdəd/', 'audio': 'https://lex-audio.useremarkable.com/mp3/sorted_us_1.mp3'}], 'meaning': {'adjective': [{'definition': 'Organized; arranged; fixed up.'}]}}]
+    # data = [{'word': 'sorted', 'phonetics': [{'text': '/ˈsɔrdəd/', 'audio': 'https://lex-audio.useremarkable.com/mp3/sorted_us_1.mp3'}], 'meaning': {'adjective': [{'definition': 'Organized; arranged; fixed up.'}]}}]
+    
     app = QtWidgets.QApplication(sys.argv)
+
+#     re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
+#     re_window.show()
+
+    data = {
+                "meaning": {
+                        "korean": "비우다, 비어 있는, 빈",
+                        "noun": "(nou) a container that has been emptied",
+                        "verb": "(vrb) make void or empty of contents\n(vrb) become empty or void of its content\n(vrb) leave behind empty; move out of\n(vrb) remove\n(vrb) excrete or discharge from the body",
+                        "adverb": "",
+                        "adjective": "(adj) holding or containing nothing\n(adj) devoid of significance or point\n(adj) needing nourishment\n(adj) emptied of emotion"
+                },
+                "example": [
+                        "I always empty and clean ashtrays and wastebaskets.",
+                        "The higher the resolution the bigger the empty space.",
+                        "The more empty space, the more readily the humidity will drop.",
+                        "Gases always intermix since free molecules will always move into empty space.",
+                        "On the scale of the clumps within the rings there is much empty space.",
+            "On the scale of the clumps within the rings there is a lot of empty space.",
+            "An analogous case concerns the empty conjunction and the empty disjunction.",
+            "There were empty seats galore.",
+            "The streets are empty and desolate.",
+            "They did not empty the cruet."
+        ]
+    }
 
     re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
     re_window.show()
+    
     sys.exit( app.exec_() )
     
