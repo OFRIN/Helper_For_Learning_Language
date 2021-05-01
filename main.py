@@ -74,7 +74,7 @@ class Collector(QMainWindow):
     def initUI(self):
         self.setWindowTitle('Helper For Learning Language')
         self.resize(700, 120)
-
+        
         self.check_logs = make_checkbox(self, 'Logs (ON/OFF)', (10, 10), self.show_logs)
         self.check_mouse = make_checkbox(self, 'Detect Mouse (ON/OFF)', (10, 30), self.detect_mouse_events)
         self.check_auto = make_checkbox(self, 'Auto Searching (ON/OFF)', (10, 50), self.auto_searching)
