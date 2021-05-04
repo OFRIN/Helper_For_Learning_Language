@@ -26,7 +26,7 @@ class MainWindow(QMainWindow):
 
     def clickMethod(self):
         print('Your name: ' + self.line.text())
-
+        
         self.line.adjustSize()
 
 if __name__ == "__main__":

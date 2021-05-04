@@ -58,9 +58,13 @@ class Tab_Window(QtWidgets.QWidget):
                 group_of_meaning = QtWidgets.QGroupBox(str(group['index'] + 1), self)
                 group_of_meaning.setGeometry(default_rect)
                 
+                meaning_string = '# meaning\n' + '- ' + group['meaning']['definition']
+                if 'kr_definition' in group['meaning']:
+                    meaning_string += '\n' + '- ' + group['meaning']['kr_definition']
+
                 en_definition = make_label(
                     group_of_meaning, 
-                    '# meaning\n' + '- ' + group['meaning']['definition'], 
+                    meaning_string,
                     (10, 20)
                 )
                 previous_rect = en_definition.geometry()
@@ -74,9 +78,14 @@ class Tab_Window(QtWidgets.QWidget):
                     previous_rect = en_synonyms.geometry()
                 
                 if 'example' in group['meaning']:
+                    example_string = '# example\n' + '- ' + group['meaning']['example']
+
+                    if 'kr_example' in group['meaning']:
+                        example_string += '\n' + '- ' + group['meaning']['kr_example']
+
                     en_example = make_label(
                             group_of_meaning, 
-                            '# example\n' + '- ' + group['meaning']['example'], 
+                            example_string, 
                             (10, previous_rect.y() + previous_rect.height() + margin)
                     )
                 
@@ -115,22 +124,17 @@ class MP3_Callback:
 
         p = vlc.MediaPlayer(self.mp3_url)
         p.play()
-
+        
         # player = QtMultimedia.QMediaPlayer()
         # player.setMedia(QtCore.QUrl(self.mp3_url))
         # player.play()
-
+        
         # QtMultimedia.QSound.play(self.mp3_url)
 
 # class Registration_Window(QtWidgets.QWidget):
 class Registration_Window(QtWidgets.QDialog):
-    def __init__(self, word, phonetics, meanings, korean_meaning=''):
+    def __init__(self, word, phonetics, meanings, korean_meaning='', position=(10, 10)):
         super().__init__(parent=None)
-        
-        # 검토 필요
-        # self.center()
-        self.move(10, 10)
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint|QtCore.Qt.FramelessWindowHint)
 
         self.minimum_width = 300
         
@@ -146,19 +150,23 @@ class Registration_Window(QtWidgets.QDialog):
         self.make_tablewidget_for_meanings(meanings)
 
         self.adjustSize()
-
+        
         if self.geometry().width() < self.minimum_width:
             self.setFixedWidth(self.minimum_width)
 
-    def center(self):
-        qr = self.frameGeometry()
-        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
-        qr.moveCenter(cp)
-        self.move(qr.topLeft())
+        print(position)
+        self.move(*position)
+        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint) # |QtCore.Qt.FramelessWindowHint
+        
+#     def center(self):
+#         qr = self.frameGeometry()
+#         cp = QtWidgets.QDesktopWidget().availableGeometry().center()
+#         qr.moveCenter(cp)
+#         self.move(qr.topLeft())
 
     def make_groupbox_for_phonetics(self, phonetics):
         rect_of_word = self.word.geometry()
-
+        
         self.group_of_phonetics = QtWidgets.QGroupBox('Phonetics', self)
         self.group_of_phonetics.setGeometry(QtCore.QRect(10, rect_of_word.y() + rect_of_word.height() + 20, 250, 80))
         
@@ -186,7 +194,7 @@ class Registration_Window(QtWidgets.QDialog):
             self.btn_play.setGeometry(QtCore.QRect(rect_of_label.x() + w + 20, y, 100, h))
             self.btn_play.clicked.connect(MP3_Callback(phonetic['audio']))
             self.btn_play.setIcon(QtGui.QIcon('./resources/mx-player-icon.png'))
-
+        
         self.group_of_phonetics.adjustSize()
         # self.group_of_phonetics.setFixedWidth(250)
     
@@ -222,7 +230,6 @@ class Registration_Window(QtWidgets.QDialog):
         return super().exec_()
 
 if __name__ == "__main__":
-    """
     data = [
             {
                     "word": "take",
@@ -360,176 +367,36 @@ if __name__ == "__main__":
                     }
             }
     ]
-    """
-    """
-    data = [
-                {
-                        "word": "have",
-                        "phonetics": [
-                                {
-                                        "text": "/hæv/",
-                                        "audio": "https://lex-audio.useremarkable.com/mp3/have_us_3.mp3"
-                                },
-                                {
-                                        "text": "/həv/",
-                                        "audio": "https://lex-audio.useremarkable.com/mp3/have_us_1_rr.mp3"
-                                },
-                                {
-                                        "text": "/(ə)v/",
-                                        "audio": "https://lex-audio.useremarkable.com/mp3/have_us_2.mp3"
-                                }
-                        ],
-                        "meaning": {
-                                "transitive verb": [
-                                        {
-                                                "definition": "Possess, own, or hold.Possess or be provided with (a quality, characteristic, or feature)Provide or indulge oneself with (something)Be made up of; comprise.Used to indicate a particular relationship.Be able to make use of (something available or at one's disposal)Have gained (a qualification)Possess as an intellectual attainment; know (a language or subject)",
-                                                "synonyms": [
-                                                        "possess",
-                                                        "own",
-                                                        "be in possession of",
-                                                        "be the owner of",
-                                                        "be the possessor of",
-                                                        "be the proud possessor of",
-                                                        "have in one's possession",
-                                                        "have to one's name",
-                                                        "count among one's possessions",
-                                                        "be blessed with",
-                                                        "boast",
-                                                        "enjoy"
-                                                ],
-                                                "example": "he had a new car and a boat"
-                                        },
-                                        {
-                                                "definition": "Experience; undergo.",
-                                                "synonyms": [
-                                                        "experience",
-                                                        "encounter",
-                                                        "undergo",
-                                                        "face",
-                                                        "meet",
-                                                        "find",
-                                                        "go through",
-                                                        "run into",
-                                                        "come across",
-                                                        "be subjected to",
-                                                        "have experience of",
-                                                        "be faced with"
-                                                ],
-                                                "example": "I went to a few parties and had a good time"
-                                        },
-                                        {
-                                                "definition": "Be obliged or find it necessary to do the specified thing.",
-                                                "synonyms": [
-                                                        "must",
-                                                        "have got to",
-                                                        "be obliged to",
-                                                        "be required to",
-                                                        "be compelled to",
-                                                        "be forced to",
-                                                        "be bound to",
-                                                        "be duty-bound to",
-                                                        "be under an obligation to"
-                                                ],
-                                                "example": "you don't have to accept this situation"
-                                        },
-                                        {
-                                                "definition": "Perform the action indicated by the noun specified (used especially in spoken English as an alternative to a more specific verb)",
-                                                "synonyms": [
-                                                        "perform",
-                                                        "execute",
-                                                        "effect",
-                                                        "discharge",
-                                                        "carry out",
-                                                        "accomplish",
-                                                        "fulfil",
-                                                        "complete",
-                                                        "conduct",
-                                                        "implement",
-                                                        "do",
-                                                        "make",
-                                                        "have"
-                                                ],
-                                                "example": "he had a look around"
-                                        },
-                                        {
-                                                "definition": "Show (a personal attribute or quality) by one's actions or attitude.",
-                                                "synonyms": [
-                                                        "manifest",
-                                                        "show",
-                                                        "display",
-                                                        "exhibit",
-                                                        "demonstrate",
-                                                        "express",
-                                                        "evince"
-                                                ],
-                                                "example": "he had little patience with technological gadgetry"
-                                        },
-                                        {
-                                                "definition": "Place or keep (something) in a particular position.Hold or grasp (someone or something) in a particular way.",
-                                                "example": "Mary had her back to me"
-                                        },
-                                        {
-                                                "definition": "Be the recipient of (something sent, given, or done)",
-                                                "synonyms": [
-                                                        "receive",
-                                                        "get",
-                                                        "be given",
-                                                        "be sent",
-                                                        "obtain",
-                                                        "acquire",
-                                                        "procure",
-                                                        "come by",
-                                                        "take receipt of"
-                                                ],
-                                                "example": "she had a letter from Mark"
-                                        }
-                                ],
-                                "auxiliary verb": [
-                                        {
-                                                "definition": "Used with a past participle to form the perfect, pluperfect, and future perfect tenses, and the conditional mood.",
-                                                "example": "I have finished"
-                                        }
-                                ],
-                                "noun": [
-                                        {
-                                                "definition": "People with plenty of money and possessions."
-                                        }
-                                ]
-                        }
-                }
-        ]
-    """
-    # data = [{'word': 'sorted', 'phonetics': [{'text': '/ˈsɔrdəd/', 'audio': 'https://lex-audio.useremarkable.com/mp3/sorted_us_1.mp3'}], 'meaning': {'adjective': [{'definition': 'Organized; arranged; fixed up.'}]}}]
     
     app = QtWidgets.QApplication(sys.argv)
 
+    re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'], '', (-1000, 100))
+    re_window.show()
+
+#     data = {
+#                 "meaning": {
+#                         "korean": "비우다, 비어 있는, 빈",
+#                         "noun": "(nou) a container that has been emptied",
+#                         "verb": "(vrb) make void or empty of contents\n(vrb) become empty or void of its content\n(vrb) leave behind empty; move out of\n(vrb) remove\n(vrb) excrete or discharge from the body",
+#                         "adverb": "",
+#                         "adjective": "(adj) holding or containing nothing\n(adj) devoid of significance or point\n(adj) needing nourishment\n(adj) emptied of emotion"
+#                 },
+#                 "example": [
+#                         "I always empty and clean ashtrays and wastebaskets.",
+#                         "The higher the resolution the bigger the empty space.",
+#                         "The more empty space, the more readily the humidity will drop.",
+#                         "Gases always intermix since free molecules will always move into empty space.",
+#                         "On the scale of the clumps within the rings there is much empty space.",
+#             "On the scale of the clumps within the rings there is a lot of empty space.",
+#             "An analogous case concerns the empty conjunction and the empty disjunction.",
+#             "There were empty seats galore.",
+#             "The streets are empty and desolate.",
+#             "They did not empty the cruet."
+#         ]
+#     }
+
 #     re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
 #     re_window.show()
-
-    data = {
-                "meaning": {
-                        "korean": "비우다, 비어 있는, 빈",
-                        "noun": "(nou) a container that has been emptied",
-                        "verb": "(vrb) make void or empty of contents\n(vrb) become empty or void of its content\n(vrb) leave behind empty; move out of\n(vrb) remove\n(vrb) excrete or discharge from the body",
-                        "adverb": "",
-                        "adjective": "(adj) holding or containing nothing\n(adj) devoid of significance or point\n(adj) needing nourishment\n(adj) emptied of emotion"
-                },
-                "example": [
-                        "I always empty and clean ashtrays and wastebaskets.",
-                        "The higher the resolution the bigger the empty space.",
-                        "The more empty space, the more readily the humidity will drop.",
-                        "Gases always intermix since free molecules will always move into empty space.",
-                        "On the scale of the clumps within the rings there is much empty space.",
-            "On the scale of the clumps within the rings there is a lot of empty space.",
-            "An analogous case concerns the empty conjunction and the empty disjunction.",
-            "There were empty seats galore.",
-            "The streets are empty and desolate.",
-            "They did not empty the cruet."
-        ]
-    }
-
-    re_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'])
-    re_window.show()
     
     sys.exit( app.exec_() )
     

@@ -9,6 +9,9 @@ pip install PyQt5
 pip install pynput
 pip install python-vlc
 pip install -U word_forms
+
+pip install opencv-python
+pip install selenium
 ```
 
 # Library

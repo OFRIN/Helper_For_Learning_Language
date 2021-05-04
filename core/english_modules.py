@@ -11,7 +11,7 @@ import multiprocessing as mp
 from tools.json_utils import read_json
 
 from tools.english_utils import check_english_sentence
-from tools.english_utils import *
+from tools.english_utils import check_sentence_or_word
 
 # Interpret english word to english explanation
 class Google_Dictionary:
@@ -58,7 +58,7 @@ class Google_Dictionary:
         """
         return results
 
-# Interpret english word to english explanation aend korean expression
+# Interpret english word to english explanation and korean expression
 class Twinword:
     def __init__(self, client_id, client_secret):
         self.headers = {
@@ -100,6 +100,12 @@ class Twinword:
             if 'example' in data:
                 results['example'] = data['example']
 
+        # if 'association' in class_names:
+        #     url = self.url_format.format('example')
+        #     response = requests.request("GET", url, headers=self.headers, params=querystring)
+
+        #     data = json.loads(response.text)
+
         return results
 
 # Translate english word or sentence
@@ -127,8 +133,7 @@ class Papago:
                 request = urllib.request.Request("https://openapi.naver.com/v1/papago/n2mt")
                 request.add_header("X-Naver-Client-Id", client_id)
                 request.add_header("X-Naver-Client-Secret", client_secret)
-
-            
+                
                 response = urllib.request.urlopen(request, data=data.encode("utf-8"))
             
                 rescode = response.getcode()
@@ -137,6 +142,52 @@ class Papago:
                     results = json.loads(response_body.decode('utf-8'))
                     return results['message']['result']['translatedText']
                 else:
-                    return None
+                    return ''
             except:
                 pass
+
+        return ''
+
+# Interpret english word to english explanation
+class WordsAPI:
+    """
+    # Definitions
+    ### url = "https://wordsapiv1.p.rapidapi.com/words/{word}/definitions"
+
+    # Examples
+    ### url = "https://wordsapiv1.p.rapidapi.com/words/{word}/examples"
+
+    # Syllables
+    ### url = "https://wordsapiv1.p.rapidapi.com/words/{word}/syllables"
+
+    # Synonyms
+    ### url = "https://wordsapiv1.p.rapidapi.com/words/{word}/synonyms"
+    """
+    def __init__(self, client_id, client_secret):
+        self.headers = {
+            'x-rapidapi-host': client_id,
+            'x-rapidapi-key': client_secret
+        }
+
+        self.url_format = "https://wordsapiv1.p.rapidapi.com/words/{}/{}/"
+        self.class_names = ['definitions', 'examples', 'synonyms', 'syllables']
+
+    def get(self, word, class_names=None):
+        if class_names is None: 
+            class_names = self.class_names
+
+        results = {}
+        for class_name in class_names:
+            url = self.url_format.format(word, class_name)
+            response = requests.request("GET", url, headers=self.headers)
+
+            data = json.loads(response.text)
+            # data = json.dumps(data, indent='\t')
+            
+            results[class_name] = data
+
+        return results
+
+class English_Manager:
+    def __init__(self, json_path):
+        read_json(json_path)

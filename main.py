@@ -1,8 +1,12 @@
 import os
+import cv2
 import sys
 import time
 import platform
-import webbrowser
+
+# import webbrowser
+from selenium import webdriver
+from time import sleep
 
 from queue import Queue
 
@@ -61,6 +65,8 @@ class Collector(QMainWindow):
         self.twin_model = Twinword(**info_dic['twinword'])
         self.google_dict = Google_Dictionary()
 
+        self.papago = Papago(**info_dic['papago'])
+
         #####################################################################################
         # UI (about PyQt5)
         #####################################################################################
@@ -70,6 +76,8 @@ class Collector(QMainWindow):
         QApplication.clipboard().dataChanged.connect(self.event_clipboard)
 
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+
+        self.image_dir = './data/images/'
     
     def initUI(self):
         self.setWindowTitle('Helper For Learning Language')
@@ -123,7 +131,7 @@ class Collector(QMainWindow):
         write_json(self.tense_path, self.tense_dict, 'utf-8')
     
     def show_registration(self, data, korean_meaning):
-        sub_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'], korean_meaning)
+        sub_window = Registration_Window(data[0]['word'], data[0]['phonetics'], data[0]['meaning'], korean_meaning, self.mouse_listner.get_position_of_mouse())
         sub_window.show()
 
     def search(self):
@@ -149,6 +157,11 @@ class Collector(QMainWindow):
                     word_forms_error = True
                 
                 data_from_google = self.google_dict.get(original_word)
+
+                for key in data_from_google[0]['meaning'].keys():
+                    for index in range(len(data_from_google[0]['meaning'][key])):
+                        data_from_google[0]['meaning'][key][index]['kr_definition'] = self.papago.get(data_from_google[0]['meaning'][key][index]['definition'])
+                        data_from_google[0]['meaning'][key][index]['kr_example'] = self.papago.get(data_from_google[0]['meaning'][key][index]['example'])
 
                 if word_forms_error:
                     original_word = data_from_google[0]['word']
@@ -184,8 +197,29 @@ class Collector(QMainWindow):
 
         url = 'https://en.dict.naver.com/#/search?query={}'.format(self.edi_word.text())
 
-        chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
-        webbrowser.get(chrome_path).open(url)
+        # chrome_path = 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s'
+        # webbrowser.get(chrome_path).open(url)
+
+        image_path = self.image_dir + self.edi_word.text().lower() + '.png'
+
+        if not os.path.isfile(image_path):
+            options = webdriver.ChromeOptions()
+            options.add_argument('headless')
+            options.add_argument('window-size=1920x1080')
+            options.add_argument("disable-gpu")
+
+            driver = webdriver.Chrome('./data/chromedriver.exe', chrome_options=options)
+            driver.get(url)
+
+            time.sleep(1.0)
+
+            driver.get_screenshot_as_file(image_path)
+            driver.quit()
+        
+        image = cv2.imread(image_path)
+        cv2.imshow('NAVER', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
         self.btn_naver.setDisabled(False)
     

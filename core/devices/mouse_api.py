@@ -26,6 +26,9 @@ class Customized_Mouse_Listener:
         self.moving_threshold = moving_threshold
         self.double_click_interval = double_click_interval
 
+    def get_position_of_mouse(self):
+        return (self.status['x'], self.status['y'])
+
     def on_move(self, x, y):
         self.status['x'] = x
         self.status['y'] = y

@@ -7,3 +7,4 @@ print(lemmatize("reveling"))
 
 data_dict = get_word_forms('stood')
 print(data_dict)
+
