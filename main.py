@@ -146,7 +146,7 @@ class Collector(QMainWindow):
 
                 data_from_google = self.db[word]['google']
                 data_from_twin = self.db[word]['twin']
-
+            
             else:
                 try:
                     word_forms_error = False

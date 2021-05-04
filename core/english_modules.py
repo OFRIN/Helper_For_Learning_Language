@@ -187,7 +187,3 @@ class WordsAPI:
             results[class_name] = data
 
         return results
-
-class English_Manager:
-    def __init__(self, json_path):
-        read_json(json_path)
