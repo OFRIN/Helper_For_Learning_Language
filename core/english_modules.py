@@ -1,4 +1,5 @@
 import os
+import cv2
 import sys
 import json
 
@@ -6,6 +7,7 @@ import requests
 import urllib.request
 
 import time
+
 import multiprocessing as mp
 
 from selenium import webdriver
@@ -190,25 +192,65 @@ class WordsAPI:
 
         return results
 
+class NAVER_Dictionary_Crawler:
+    def __init__(self, image_dir, chrome_path, delay=1.0):
+        self.driver = self.make_webdriver(chrome_path)
+
+        self.image_dir = image_dir
+        self.delay = delay
+
+        self.url_format = 'https://en.dict.naver.com/#/search?query={}'
+
+    def __del__(self):
+        self.driver.quit()
+
+    def __call__(self, text):
+        image_path = self.get_image_path(text)
+
+        if not os.path.isfile(image_path):
+            self.capture_screen(text, image_path)
+        
+        return cv2.imread(image_path)
+
+    def make_webdriver(self, chrome_path):
+        options = webdriver.ChromeOptions()
+
+        options.add_argument('headless')
+        options.add_argument('window-size=1920x1080')
+        options.add_argument("disable-gpu")
+
+        return webdriver.Chrome(chrome_path, chrome_options=options)
+
+    def get_image_path(self, word):
+        refined_word = word.replace('\'', '#').lower()
+        return self.image_dir + refined_word + '.png'
+
+    def capture_screen(self, text, image_path):
+        url = self.url_format.format(text)
+        self.driver.get(url)
+
+        time.sleep(self.delay)
+        
+        self.driver.get_screenshot_as_file(image_path)
+
 class NAVER_Dictionary_Downloader(mp.Process):
-    def __init__(self):
+    def __init__(self, **kwargs):
         super().__init__()
         
         self.daemon = True
         self.queue = mp.Queue()
 
-        self.url_format = 'https://en.dict.naver.com/#/search?query={}'
+        self.crawler = NAVER_Dictionary_Crawler(**kwargs)
 
         self.start()
 
     def put(self, text):
         self.queue.put(text)
-    
+
     def run(self):
         while True:
-
             if self.queue.empty():
                 continue
-
+            
             text = self.queue.get_nowait()
-            print(text)
+            self.crawler(text)

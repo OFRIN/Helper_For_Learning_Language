@@ -1,3 +1,38 @@
+
+def remove_wrong_keyword(data):
+    lowered_data = data.lower()
+    lowered_alphabet = 'abcdefghijknmlopqrstuvwxyz'
+
+    start_index = 0
+    end_index = len(data)
+
+    cond_fn = lambda i: lowered_data[i] in lowered_alphabet
+    
+    # find start index (->)
+    for i in range(len(data) - 1):
+        # If this is alphabet, loop statement is finished. 
+        if cond_fn(i):
+            break
+        
+        if not cond_fn(i) and cond_fn(i + 1):
+            start_index = i + 1
+            break
+
+    # find end index (<-)
+    for i in range(len(data) - 1)[::-1]:
+        if cond_fn(i) and not cond_fn(i + 1):
+            end_index = i + 1
+            break
+
+    # print(start_index, end_index)
+    return data[start_index:end_index]
+
+def remove_kindle_option(data):
+    if 'Kindle' in data:
+        data = data.replace('\n\n' + data.split('\n\n')[-1], '')
+    
+    return data
+
 def check_string_type(data):
     if type(data) == type(''):
         if data != '':
