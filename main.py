@@ -146,7 +146,7 @@ class Collector(QMainWindow):
 
                 data_from_google = self.db[word]['google']
                 data_from_twin = self.db[word]['twin']
-            
+
             else:
                 try:
                     word_forms_error = False
@@ -207,7 +207,7 @@ class Collector(QMainWindow):
             options.add_argument('headless')
             options.add_argument('window-size=1920x1080')
             options.add_argument("disable-gpu")
-
+            
             driver = webdriver.Chrome('./data/chromedriver.exe', chrome_options=options)
             driver.get(url)
 

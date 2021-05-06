@@ -5,8 +5,10 @@ import json
 import requests
 import urllib.request
 
-import queue
+import time
 import multiprocessing as mp
+
+from selenium import webdriver
 
 from tools.json_utils import read_json
 
@@ -187,3 +189,26 @@ class WordsAPI:
             results[class_name] = data
 
         return results
+
+class NAVER_Dictionary_Downloader(mp.Process):
+    def __init__(self):
+        super().__init__()
+        
+        self.daemon = True
+        self.queue = mp.Queue()
+
+        self.url_format = 'https://en.dict.naver.com/#/search?query={}'
+
+        self.start()
+
+    def put(self, text):
+        self.queue.put(text)
+    
+    def run(self):
+        while True:
+
+            if self.queue.empty():
+                continue
+
+            text = self.queue.get_nowait()
+            print(text)
