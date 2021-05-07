@@ -203,14 +203,14 @@ class NAVER_Dictionary_Crawler:
 
     def __del__(self):
         self.driver.quit()
-
+    
     def __call__(self, text):
         image_path = self.get_image_path(text)
 
         if not os.path.isfile(image_path):
             self.capture_screen(text, image_path)
         
-        return cv2.imread(image_path)
+        return image_path
 
     def make_webdriver(self, chrome_path):
         options = webdriver.ChromeOptions()
@@ -220,7 +220,7 @@ class NAVER_Dictionary_Crawler:
         options.add_argument("disable-gpu")
 
         return webdriver.Chrome(chrome_path, chrome_options=options)
-
+    
     def get_image_path(self, word):
         refined_word = word.replace('\'', '#').lower()
         return self.image_dir + refined_word + '.png'
@@ -232,25 +232,3 @@ class NAVER_Dictionary_Crawler:
         time.sleep(self.delay)
         
         self.driver.get_screenshot_as_file(image_path)
-
-class NAVER_Dictionary_Downloader(mp.Process):
-    def __init__(self, **kwargs):
-        super().__init__()
-        
-        self.daemon = True
-        self.queue = mp.Queue()
-
-        self.crawler = NAVER_Dictionary_Crawler(**kwargs)
-
-        self.start()
-
-    def put(self, text):
-        self.queue.put(text)
-
-    def run(self):
-        while True:
-            if self.queue.empty():
-                continue
-            
-            text = self.queue.get_nowait()
-            self.crawler(text)

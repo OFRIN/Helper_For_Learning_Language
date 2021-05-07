@@ -2,6 +2,7 @@ import os
 import cv2
 import sys
 import time
+import socket
 import platform
 
 from PyQt5.Qt import Qt
@@ -14,6 +15,30 @@ from core.devices import mouse_api, keyboard_api
 
 from tools import english_utils
 from tools import qt_utils
+
+class Downloader(QtCore.QThread):
+    show_image = QtCore.pyqtSignal(str)
+
+    def __init__(self, image_dir, chrome_path, delay, parent=None):
+        super().__init__(parent=parent)
+        
+        self.working = True
+        self.text = None
+
+        self.crawler = english_modules.NAVER_Dictionary_Crawler(image_dir, chrome_path, delay)
+
+        self.start()
+
+    def set_text(self, text):
+        self.text = text
+
+    def run(self):
+        while self.working:
+            if self.text is not None:
+                image_path = self.crawler(self.text)
+
+                self.show_image.emit(image_path)
+                self.text = None
 
 class Collector(QMainWindow):
     def __init__(self):
@@ -35,11 +60,12 @@ class Collector(QMainWindow):
         #####################################################################################
         self.build_listner()
 
-        self.crawler = english_modules.NAVER_Dictionary_Crawler(image_dir='./data/images/', chrome_path='./data/chromedriver.exe', delay=1.0)
-
+        self.downloader = Downloader(image_dir='./data/images/', chrome_path='./data/chromedriver.exe', delay=1.0, parent=self)
+        self.downloader.show_image.connect(self.show_image)
+        
         # info_dic = read_json('./data/private_information.json')
         # self.papago = Papago(**info_dic['papago'])
-    
+        
     def build_UI(self):
         # ui
         self.setWindowTitle('Helper For Learning Language')
@@ -86,13 +112,20 @@ class Collector(QMainWindow):
     def search(self):
         self.btn_naver.setDisabled(True)
         
-        image = self.crawler(self.edi_word.text())
+        text = self.edi_word.text()
+        self.downloader.set_text(text)
+        
+        self.btn_naver.setDisabled(False)
+
+    @QtCore.pyqtSlot(str)
+    def show_image(self, image_path):
+        image = cv2.imread(image_path)
         if image is not None:
+            print('# Not found image ({})'.format(image_path))
+        else:
             cv2.imshow('NAVER', image)
             cv2.waitKey(0)
             cv2.destroyWindow('NAVER')
-        
-        self.btn_naver.setDisabled(False)
     
     def detecting_mouse(self, state):
         self.flag_detecting_mouse = self.check_detecting_mouse.isChecked()
