@@ -211,7 +211,7 @@ class NAVER_Dictionary_Crawler:
             self.capture_screen(text, image_path)
         
         return image_path
-
+    
     def make_webdriver(self, chrome_path):
         options = webdriver.ChromeOptions()
 

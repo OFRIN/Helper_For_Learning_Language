@@ -7,7 +7,7 @@ import platform
 
 from PyQt5.Qt import Qt
 
-from PyQt5 import QtCore
+from PyQt5 import QtCore, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMenu, QPushButton
 
 from core import english_modules
@@ -40,6 +40,12 @@ class Downloader(QtCore.QThread):
                 self.show_image.emit(image_path)
                 self.text = None
 
+    def close(self):
+        self.working = False
+
+        self.quit()
+        self.wait(1000)
+
 class Collector(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -49,6 +55,13 @@ class Collector(QMainWindow):
         #####################################################################################
         self.image_dir = './data/images/'
         self.chrome_path = './data/chromedriver.exe'
+        self.delay = 1.0
+
+        self.width = 550
+        self.height = 80
+
+        self.normal_icon_path = './resources/green.png'
+        self.search_icon_path = './resources/red.png'
         
         #####################################################################################
         # PyQt5
@@ -60,16 +73,21 @@ class Collector(QMainWindow):
         #####################################################################################
         self.build_listner()
 
-        self.downloader = Downloader(image_dir='./data/images/', chrome_path='./data/chromedriver.exe', delay=1.0, parent=self)
+        self.downloader = Downloader(image_dir=self.image_dir, chrome_path=self.chrome_path, delay=self.delay, parent=self)
         self.downloader.show_image.connect(self.show_image)
-        
-        # info_dic = read_json('./data/private_information.json')
-        # self.papago = Papago(**info_dic['papago'])
-        
+
+    def normal_icon(self):
+        self.setWindowIcon(QtGui.QIcon(self.normal_icon_path))
+
+    def search_icon(self):
+        self.setWindowIcon(QtGui.QIcon(self.search_icon_path))
+    
     def build_UI(self):
         # ui
+        self.normal_icon()
         self.setWindowTitle('Helper For Learning Language')
-        self.resize(550, 80)
+
+        self.setFixedSize(self.width, self.height)
         
         self.check_detecting_mouse = qt_utils.make_checkbox(self, 'Detect mouse events', (10, 10), self.detecting_mouse)
         self.check_automatic_searching = qt_utils.make_checkbox(self, 'Search meaning automatically', (10, 30), self.automatic_searching)
@@ -77,7 +95,7 @@ class Collector(QMainWindow):
         self.edi_word = qt_utils.make_edit(self, '', (10, 50))
 
         x, y, width, height = qt_utils.get_width_and_height(self.edi_word)
-        self.btn_naver = qt_utils.make_push_button(self, '', (x + width + 10, y), self.search, './resources/naver_dictionary.jpg')
+        self.btn_naver = qt_utils.make_push_button(self, '', (x + width + 10, y), self.search, './resources/searching.png')
 
         # flag
         self.flag_detecting_mouse = self.check_detecting_mouse.isChecked()
@@ -110,17 +128,19 @@ class Collector(QMainWindow):
     # Customized Functions
     ##################################################################
     def search(self):
+        self.search_icon()
         self.btn_naver.setDisabled(True)
         
         text = self.edi_word.text()
         self.downloader.set_text(text)
-        
-        self.btn_naver.setDisabled(False)
 
     @QtCore.pyqtSlot(str)
     def show_image(self, image_path):
+        self.normal_icon()
+        self.btn_naver.setDisabled(False)
+        
         image = cv2.imread(image_path)
-        if image is not None:
+        if image is None:
             print('# Not found image ({})'.format(image_path))
         else:
             cv2.imshow('NAVER', image)
@@ -174,7 +194,11 @@ class Collector(QMainWindow):
     
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Escape:
-            QtCore.QCoreApplication.instance().quit()
+            self.close()
+
+    def closeEvent(self, e):
+        self.hide()
+        self.downloader.close()
 
 if __name__ == '__main__':
     App = QApplication(sys.argv)
