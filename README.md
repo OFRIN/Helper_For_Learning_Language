@@ -7,8 +7,8 @@
 ```bash
 pip install PyQt5
 pip install pynput
-pip install python-vlc
-pip install -U word_forms
+# pip install python-vlc
+# pip install -U word_forms
 
 pip install opencv-python
 pip install selenium
@@ -33,7 +33,7 @@ python -m PyQt5.uic.pyuic -x [FILENAME].ui -o [FILENAME].py
     }
 }
 ```
-
+vgfccc
 # TODO
 
 1. 보고 있는 모니터 왼쪽 위로 출력

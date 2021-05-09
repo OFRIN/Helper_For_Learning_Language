@@ -34,12 +34,18 @@ class Downloader(QtCore.QThread):
 
     def run(self):
         while self.working:
-            if self.text is not None:
+            if self.text is None:
+                continue
+            elif len(self.text) == 0:
+                self.show_image.emit('Empty String')
+                self.text = None
+
+            else:
                 image_path = self.crawler(self.text)
 
                 self.show_image.emit(image_path)
                 self.text = None
-
+    
     def close(self):
         self.working = False
 
@@ -62,6 +68,8 @@ class Collector(QMainWindow):
 
         self.normal_icon_path = './resources/green.png'
         self.search_icon_path = './resources/red.png'
+
+        self.window_name = 'Helper'
         
         #####################################################################################
         # PyQt5
@@ -112,7 +120,9 @@ class Collector(QMainWindow):
 
     def build_listner(self):
         hotkey_dictionary = {
-            '<ctrl>+<shift>+<space>' : None
+            # '<ctrl>+<shift>+<space>' : None
+            '<ctrl>+<shift>+s' : self.search,
+            '<ctrl>+<shift>+d' : self.close_window
         }
         self.keyboard_listner = keyboard_api.Customized_Keyboard_Listener(hotkey_dictionary)
         
@@ -127,6 +137,14 @@ class Collector(QMainWindow):
     ##################################################################
     # Customized Functions
     ##################################################################
+    def show_window(self, image):
+        cv2.imshow(self.window_name, image)
+        cv2.waitKey(0)
+        self.close_window()
+
+    def close_window(self):
+        cv2.destroyWindow(self.window_name)
+
     def search(self):
         self.search_icon()
         self.btn_naver.setDisabled(True)
@@ -143,9 +161,7 @@ class Collector(QMainWindow):
         if image is None:
             print('# Not found image ({})'.format(image_path))
         else:
-            cv2.imshow('NAVER', image)
-            cv2.waitKey(0)
-            cv2.destroyWindow('NAVER')
+            self.show_window(image)
     
     def detecting_mouse(self, state):
         self.flag_detecting_mouse = self.check_detecting_mouse.isChecked()
