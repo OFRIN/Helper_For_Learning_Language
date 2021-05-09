@@ -66,8 +66,13 @@ class Collector(QMainWindow):
         self.width = 550
         self.height = 80
 
-        self.normal_icon_path = './resources/green.png'
-        self.search_icon_path = './resources/red.png'
+        # self.normal_icon_path = './resources/green.png'
+        # self.search_icon_path = './resources/red.png'
+
+        self.normal_icon_path = './resources/bookmark_G.png'
+        self.search_icon_path = './resources/bookmark_R.png'
+
+        self.btn_icon_path = './resources/naver_dictionary.png'
 
         self.window_name = 'Helper'
         
@@ -103,7 +108,7 @@ class Collector(QMainWindow):
         self.edi_word = qt_utils.make_edit(self, '', (10, 50))
 
         x, y, width, height = qt_utils.get_width_and_height(self.edi_word)
-        self.btn_naver = qt_utils.make_push_button(self, '', (x + width + 10, y), self.search, './resources/searching.png')
+        self.btn_naver = qt_utils.make_push_button(self, '', (x + width + 10, y), self.search, self.btn_icon_path)
 
         # flag
         self.flag_detecting_mouse = self.check_detecting_mouse.isChecked()
