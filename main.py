@@ -142,7 +142,15 @@ class Collector(QMainWindow):
     ##################################################################
     # Customized Functions
     ##################################################################
-    def show_window(self, image):
+    def show_window(self, image, cropped=True):
+        if cropped:
+            h, w, c = image.shape
+
+            xmin, ymin = 462, 242
+            xmax, ymax = 1152, h - 1
+
+            image = image[ymin:ymax, xmin:xmax]
+
         cv2.imshow(self.window_name, image)
         cv2.waitKey(0)
         self.close_window()
