@@ -75,6 +75,9 @@ class Collector(QMainWindow):
         self.btn_icon_path = './resources/naver_dictionary.png'
 
         self.window_name = 'Helper'
+
+        if not os.path.isdir(self.image_dir):
+            os.makedirs(self.image_dir)
         
         #####################################################################################
         # PyQt5
@@ -152,8 +155,10 @@ class Collector(QMainWindow):
             image = image[ymin:ymax, xmin:xmax]
 
         cv2.imshow(self.window_name, image)
-        cv2.waitKey(0)
+        key = cv2.waitKey(0)
         self.close_window()
+
+        return key
 
     def close_window(self):
         cv2.destroyWindow(self.window_name)
@@ -174,7 +179,9 @@ class Collector(QMainWindow):
         if image is None:
             print('# Not found image ({})'.format(image_path))
         else:
-            self.show_window(image)
+            key = self.show_window(image)
+            if key == ord('r'):
+                os.remove(image_path)
     
     def detecting_mouse(self, state):
         self.flag_detecting_mouse = self.check_detecting_mouse.isChecked()
