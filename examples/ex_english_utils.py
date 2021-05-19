@@ -14,7 +14,10 @@ for input_string in [
         ' string',
         ' string; string; ',
         'I have to refine the words,',
-        ';; I have to refine the words,,;'
+        ';; I have to refine the words,,;',
+        'belongs to',
+        'to belongs',
+        'to belongs from'
     ]:
     refined_string = english_utils.remove_wrong_keyword(input_string)
     print('\"{}\"'.format(input_string), "->", '\"{}\"'.format(refined_string))

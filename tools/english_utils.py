@@ -19,9 +19,16 @@ def remove_wrong_keyword(data):
             break
 
     # find end index (<-)
-    for i in range(len(data) - 1)[::-1]:
-        if cond_fn(i) and not cond_fn(i + 1):
+    # if cond_fn(data[-1]):
+    #     end_index = len(data)
+    # else:
+    for i in range(len(data))[::-1]:
+        if cond_fn(i):
             end_index = i + 1
+            break
+        
+        elif cond_fn(i - 1) and not cond_fn(i):
+            end_index = i
             break
 
     # print(start_index, end_index)
