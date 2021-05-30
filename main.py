@@ -217,6 +217,8 @@ class Collector(QMainWindow):
         text = QApplication.clipboard().text()
 
         if len(text) > 0:
+            print(text)
+
             # exception 1. kindle
             text = english_utils.remove_kindle_option(text)
             
